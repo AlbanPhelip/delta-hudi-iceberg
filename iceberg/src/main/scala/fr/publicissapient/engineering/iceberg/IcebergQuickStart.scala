@@ -33,18 +33,20 @@ object IcebergQuickStart extends App with SparkSessionProvider {
     .identity("name")
     .build()
 
-  val table = tables.create(schema, spec, s"file://$rootPath/hudi-quick-start")
+  private val tablePath = "iceberg-quick-start"
+
+  val table = tables.create(schema, spec, s"file://$rootPath/$tablePath")
 
   df1.write
-    .mode("append").iceberg(s"file://$rootPath/hudi-quick-start")
+    .mode("append").iceberg(s"file://$rootPath/$tablePath")
 
   // read the table
   spark.read
-    .iceberg(s"$rootPath/hudi-quick-start")
+    .iceberg(s"$rootPath/$tablePath")
     .show()
 
   spark.read
-    .parquet(s"$rootPath/hudi-quick-start")
+    .parquet(s"$rootPath/$tablePath")
     .show()
 
 }
