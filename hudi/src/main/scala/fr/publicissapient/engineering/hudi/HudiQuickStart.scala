@@ -1,59 +1,44 @@
 package fr.publicissapient.engineering.hudi
 
-import fr.publicissapient.engineering.utils.{FileUtils, SparkSessionProvider}
-
-import fr.publicissapient.engineering.model.Person
+import fr.publicissapient.engineering.model.Customer._
 import fr.publicissapient.engineering.utils.ExtensionMethodsUtils._
-import org.apache.hudi.QuickstartUtils._
-import org.apache.spark.sql.SaveMode._
+import fr.publicissapient.engineering.utils.FileUtils
 import org.apache.hudi.DataSourceWriteOptions._
+import org.apache.hudi.QuickstartUtils._
 import org.apache.hudi.config.HoodieWriteConfig._
+import org.apache.spark.sql.SaveMode._
+import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SaveMode}
 
-
-
-object HudiQuickStart extends App with SparkSessionProvider {
-
-
-  import spark.implicits._
+object HudiQuickStart extends App {
 
   val tableName = "hudi_trips_cow"
-  val rootPath = args.head
+  val rootPath = s"${args.head}/hudi-upsert"
 
   FileUtils.delete(rootPath)
 
-  val df1: DataFrame = List(
-    Person("Toto", 21, "2020-06-09"),
-    Person("Titi", 30, "2019-06-09")
-  ).toDF()
-
-  def writeData(df: DataFrame, saveMode: SaveMode): Unit = {
+  def writeData(df: DataFrame, saveMode: SaveMode, mode: String = ""): Unit = {
     df.write.
       options(getQuickstartWriteConfigs).
-      option(PRECOMBINE_FIELD_OPT_KEY, "date").
-      option(RECORDKEY_FIELD_OPT_KEY, "name").
-      //option(PARTITIONPATH_FIELD_OPT_KEY, "date").
+      option(OPERATION_OPT_KEY, mode).
+      option(PRECOMBINE_FIELD_OPT_KEY, "id").
+      option(RECORDKEY_FIELD_OPT_KEY, "id").
       option(TABLE_NAME, tableName).
       mode(saveMode).
-      hudi(s"$rootPath/hudi-quick-start")
+      hudi(rootPath)
   }
 
   def printData(): Unit = {
     spark.read
-      .hudi(s"$rootPath/hudi-quick-start/*")
+      .hudi(s"$rootPath/*")
       .show(truncate = false)
   }
 
-  writeData(df1, Overwrite)
+  writeData(customers, Overwrite)
   printData()
 
-
-  val df2: DataFrame = List(
-    Person("Toto", 22, "2020-06-10"),
-    Person("Tata", 30, "2020-06-10")
-  ).toDF()
-
-  writeData(df2, Append)
+  writeData(newCustomers.filter(col("deleted") === "false"), Append)
+  writeData(newCustomers.filter(col("deleted") === "true"), Append, "delete")
   printData()
 
 }

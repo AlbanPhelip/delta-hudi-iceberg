@@ -1,34 +1,20 @@
 package fr.publicissapient.engineering.delta
 
-import fr.publicissapient.engineering.model.Customer
+import fr.publicissapient.engineering.model.Customer._
 import fr.publicissapient.engineering.utils.{FileUtils, SparkSessionProvider}
 import fr.publicissapient.engineering.utils.ExtensionMethodsUtils._
 import io.delta.tables.DeltaTable
 import org.apache.spark.sql.functions.col
-import org.apache.spark.sql.{DataFrame, SaveMode}
+import org.apache.spark.sql.SaveMode
 
-object DeltaMerge extends App with SparkSessionProvider {
-
-  import spark.implicits._
+object DeltaMerge extends App {
 
   val rootPath = args.head
-  val personPath = s"$rootPath/person-merge"
-
+  val personPath = s"$rootPath/delta-upsert"
   FileUtils.delete(personPath)
 
-  val customers: DataFrame = List(
-    Customer(0, "Grace", "Hopper", 50, deleted = false),
-    Customer(1, "Alan", "Turing", 38, deleted = false),
-    Customer(2, "Margaret", "Hamilton", 41, deleted = false)
-  ).toDF()
 
   customers.coalesce(3).write.mode(SaveMode.Overwrite).delta(personPath)
-
-  val newCustomers: DataFrame = List(
-    Customer(1, "Alan", "Turing", 38, deleted = true),
-    Customer(2, "Margaret", "Hamilton", 42, deleted = false),
-    Customer(3, "Linus", "Torvalds", 23, deleted = false)
-  ).toDF()
 
   val deltaCustomer = DeltaTable.forPath(personPath)
 
@@ -42,7 +28,7 @@ object DeltaMerge extends App with SparkSessionProvider {
   val newTableName = "new-customer"
 
   deltaCustomer.as(oldTableName)
-    .merge(newCustomers.as(newTableName),  $"$oldTableName.id" ===  $"$newTableName.id")
+    .merge(newCustomers.as(newTableName),  col(s"$oldTableName.id") ===  col(s"$newTableName.id"))
     .whenMatched(col(s"$newTableName.deleted") === true)
     .delete()
     .whenMatched()
