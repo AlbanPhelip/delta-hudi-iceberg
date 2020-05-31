@@ -2,7 +2,7 @@ package fr.publicissapient.engineering.iceberg
 
 
 import fr.publicissapient.engineering.utils.{FileUtils, SparkSessionProvider}
-/*
+
 import fr.publicissapient.engineering.model.Person
 import org.apache.spark.sql.DataFrame
 import fr.publicissapient.engineering.utils.ExtensionMethodsUtils._
@@ -11,10 +11,10 @@ import org.apache.iceberg.catalog.TableIdentifier
 import org.apache.iceberg.hadoop.HadoopTables
 import org.apache.iceberg.hive.HiveCatalog
 import org.apache.iceberg.spark.SparkSchemaUtil
-*/
+
 
 object IcebergQuickStart extends App with SparkSessionProvider {
-/*
+
   import spark.implicits._
 
   val rootPath = args.head
@@ -46,5 +46,5 @@ object IcebergQuickStart extends App with SparkSessionProvider {
   spark.read
     .parquet(s"$rootPath/hudi-quick-start")
     .show()
-*/
+
 }

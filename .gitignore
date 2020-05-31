@@ -1,8 +1,25 @@
-target/
-project/target/
-project/project/target/
+delta/target/
+delta/project/target/
+delta/project/project/target/
+delta/data/
+
+hudi/target/
+hudi/project/target/
+hudi/project/project/target/
+hudi/data/
+
+iceberg/target/
+iceberg/project/target/
+iceberg/project/project/target/
+iceberg/data/
+
+common/target/
+common/project/target/
+common/project/project/target/
+common/data/
+common/~/
+
 
 .idea/
 
-data/
 
