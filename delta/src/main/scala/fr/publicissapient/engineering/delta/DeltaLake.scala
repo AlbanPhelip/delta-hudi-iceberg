@@ -14,9 +14,10 @@ object DeltaLake extends App {
   // Initialization
   people.write.delta(tablePath)
 
+  // Upsert and Delete
   val deltaPeople = DeltaTable.forPath(tablePath)
   deltaPeople.as("current-people")
-    .merge(newPeople.as("new-people"),  col("current-people.id") ===  col("new-people.id"))
+    .merge(newPeople.as("new-people"),  col("current-people.id") === col("new-people.id"))
     .whenMatched(col("new-people.deleted") === true)
     .delete()
     .whenMatched()

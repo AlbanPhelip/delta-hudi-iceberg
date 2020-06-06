@@ -22,7 +22,7 @@ object Hudi extends App {
     option(TABLE_NAME, "hudi").
     hudi(tablePath)
 
-  // Update and Insert
+  // Upsert
   newPeople.filter(col("deleted") === "false").
     write.
     options(getQuickstartWriteConfigs).
