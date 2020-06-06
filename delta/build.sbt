@@ -7,7 +7,7 @@ version := "0.1"
 scalaVersion := "2.12.11"
 
 // Versions
-val deltaLakeVersion = "0.6.0"
+val deltaLakeVersion = "0.6.1"
 
 // Common
 libraryDependencies += "fr.publicissapient.engineering.dataxdays" %% "common" % "0.1.0"
